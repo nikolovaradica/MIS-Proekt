@@ -23,7 +23,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _dateOfBirthController = TextEditingController();
   final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  bool _obscurePassword = true;
+  bool _obscureCurrentPassword = true;
+  bool _obscureNewPassword = true;
 
   @override
   void initState() {
@@ -171,14 +172,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           CustomTextFormField(
                             label: 'New Password',
                             controller: _newPasswordController,
-                            obscureText: _obscurePassword,
+                            obscureText: _obscureNewPassword,
                             suffixIcon: IconButton(
-                              icon: Icon(_obscurePassword
+                              icon: Icon(_obscureNewPassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined, color: const Color.fromARGB(255, 207, 207, 207),),
                               onPressed: () {
                                 setState(() {
-                                  _obscurePassword = !_obscurePassword;
+                                  _obscureNewPassword = !_obscureNewPassword;
                                 });
                               },
                             ),
@@ -186,14 +187,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           CustomTextFormField(
                             label: 'Confirm Old Password', 
                             controller: _currentPasswordController, 
-                            obscureText: _obscurePassword,
+                            obscureText: _obscureCurrentPassword,
                             suffixIcon: IconButton(
-                              icon: Icon(_obscurePassword
+                              icon: Icon(_obscureCurrentPassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined, color: const Color.fromARGB(255, 207, 207, 207),),
                               onPressed: () {
                                 setState(() {
-                                  _obscurePassword = !_obscurePassword;
+                                  _obscureCurrentPassword = !_obscureCurrentPassword;
                                 });
                               },
                             ),
