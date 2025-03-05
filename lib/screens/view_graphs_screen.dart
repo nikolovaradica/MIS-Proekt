@@ -23,8 +23,8 @@ class ViewGraphsScreen extends StatelessWidget {
     var filteredEntries = data.entries.where((entry) {
       return entry.key.isAfter(daysAgo) && entry.key.isBefore(now);
     }).toList();
-    filteredEntries.sort((a, b) => b.key.compareTo(a.key));
-    
+    filteredEntries.sort((a, b) => a.key.compareTo(b.key));
+
     return filteredEntries.map((entry) {
       final start = entry.value.sleepStartTime.hour + entry.value.sleepStartTime.minute / 60;
       final end = entry.value.sleepEndTime.hour + entry.value.sleepEndTime.minute / 60;
@@ -57,7 +57,7 @@ class ViewGraphsScreen extends StatelessWidget {
     var filteredEntries = data.entries.where((entry) {
       return entry.key.isAfter(daysAgo) && entry.key.isBefore(now);
     }).toList();
-    filteredEntries.sort((a, b) => b.key.compareTo(a.key));
+    filteredEntries.sort((a, b) => a.key.compareTo(b.key));
 
     const moodMap = {'mood_1': 'angry', 'mood_2': 'sad', 'mood_3': 'neutral', 'mood_4': 'happy', 'mood_5': 'super'};
     final moodFrequency = {'angry': 0, 'sad': 0, 'neutral': 0, 'happy': 0, 'super': 0};
