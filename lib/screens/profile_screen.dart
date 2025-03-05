@@ -21,8 +21,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _dateOfBirthController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isEmailChanged = false;
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -55,8 +56,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (user != null && firebaseUser != null) {
       try {
+        if (_newPasswordController.text.isNotEmpty) {
+          await AuthService().reauthenticate(firebaseUser.email!, _currentPasswordController.text);
+          await firebaseUser.updatePassword(_newPasswordController.text);
+          _currentPasswordController.text = _newPasswordController.text;
+        }
         if (_emailController.text != user.email) {
-          if (_passwordController.text.isEmpty) {
+          if (_currentPasswordController.text.isEmpty && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text(
@@ -68,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
             return;
           }
-          await AuthService().reauthenticate(firebaseUser.email!, _passwordController.text);
+          await AuthService().reauthenticate(firebaseUser.email!, _currentPasswordController.text);
           await firebaseUser.verifyBeforeUpdateEmail(_emailController.text);
         }
         user.firstName = _firstNameController.text;
@@ -93,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Error updating email: ${e.message}', 
+                e.code, 
                 style: const TextStyle(color: Color(0xFF5D9EEA)),
               ),
               backgroundColor: Theme.of(context).primaryColor,
@@ -110,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastNameController.dispose();
     _emailController.dispose();
     _dateOfBirthController.dispose();
-    _passwordController.dispose();
+    _currentPasswordController.dispose();
     super.dispose();
   }
 
@@ -160,19 +166,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           CustomTextFormField(
                             label: 'Email',
-                            controller: _emailController,
-                            onChanged: (value) {
-                              setState(() {
-                                _isEmailChanged = value != user.email;
-                              });
-                            }
+                            controller: _emailController
                           ),
-                          if (_isEmailChanged)
-                            CustomTextFormField(
-                              label: 'Password (to confirm)', 
-                              controller: _passwordController, 
-                              obscureText: true
+                          CustomTextFormField(
+                            label: 'New Password',
+                            controller: _newPasswordController,
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined, color: const Color.fromARGB(255, 207, 207, 207),),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
+                          ),
+                          CustomTextFormField(
+                            label: 'Confirm Old Password', 
+                            controller: _currentPasswordController, 
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined, color: const Color.fromARGB(255, 207, 207, 207),),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                          ),
                           CustomTextFormField(
                             label: 'Date of Birth',
                             controller: _dateOfBirthController,
