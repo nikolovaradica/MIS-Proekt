@@ -1,0 +1,240 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:lifelog/providers/user_provider.dart';
+import 'package:lifelog/screens/landing_screen.dart';
+import 'package:lifelog/services/auth_service.dart';
+import 'package:lifelog/widgets/central_card.dart';
+import 'package:lifelog/widgets/custom_text_form_field.dart';
+import 'package:lifelog/widgets/gradient_background.dart';
+import 'package:provider/provider.dart';
+
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? userData;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _dateOfBirthController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isEmailChanged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    
+    if(userProvider.user == null) {
+      await userProvider.loadUser();
+    }
+    
+    final user = userProvider.user;
+    if (user != null) {
+      setState(() {
+        _firstNameController.text = user.firstName;
+        _lastNameController.text = user.lastName;
+        _emailController.text = user.email;
+        _dateOfBirthController.text = user.dateOfBirth.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+
+    if (user != null && firebaseUser != null) {
+      try {
+        if (_emailController.text != user.email) {
+          if (_passwordController.text.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Please enter your password to confirm changes', 
+                  style: TextStyle(color: Color(0xFF5D9EEA)),
+                ),
+                backgroundColor: Colors.white,
+              ),
+            );
+            return;
+          }
+          await AuthService().reauthenticate(firebaseUser.email!, _passwordController.text);
+          await firebaseUser.verifyBeforeUpdateEmail(_emailController.text);
+        }
+        user.firstName = _firstNameController.text;
+        user.lastName = _lastNameController.text;
+        user.email = _emailController.text;
+        user.dateOfBirth = DateTime.parse(_dateOfBirthController.text);
+
+        await userProvider.updateUser(user);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Profile updated successfully', 
+              style: TextStyle(color: Color(0xFF5D9EEA)),
+            ),
+            backgroundColor: Colors.white,
+          ),
+        );
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error updating email: ${e.message}', 
+              style: const TextStyle(color: Color(0xFF5D9EEA)),
+            ),
+            backgroundColor: Colors.white,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _dateOfBirthController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+
+    if (user == null) {
+      return Container(
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF5D9EEA),),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          const GradientBackground(showLogo: true),
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.9,
+                  child: CentralCard(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          CustomTextFormField(
+                            label: 'First Name', 
+                            controller: _firstNameController
+                          ),
+                          CustomTextFormField(
+                            label: 'Last Name', 
+                            controller: _lastNameController,
+                          ),
+                          CustomTextFormField(
+                            label: 'Email',
+                            controller: _emailController,
+                            onChanged: (value) {
+                              setState(() {
+                                _isEmailChanged = value != user.email;
+                              });
+                            }
+                          ),
+                          if (_isEmailChanged)
+                            CustomTextFormField(
+                              label: 'Password (to confirm)', 
+                              controller: _passwordController, 
+                              obscureText: true
+                            ),
+                          CustomTextFormField(
+                            label: 'Date of Birth',
+                            controller: _dateOfBirthController,
+                            readOnly: true,
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: user.dateOfBirth,
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime.now(),
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: ThemeData.light().copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: Color(0xFF5D9EEA),
+                                        onPrimary: Colors.white
+                                      )
+                                    ),
+                                    child: child!
+                                  );
+                                }
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  _dateOfBirthController.text = pickedDate.toLocal().toString().split(' ')[0];
+                                });
+                              }
+                            },
+                            suffixIcon: const Icon(Icons.calendar_today, color: Color.fromARGB(255, 207, 207, 207)),
+                          ),
+                          ElevatedButton(
+                            onPressed: _saveProfile,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.maxFinite, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              foregroundColor: Colors.white,
+                              backgroundColor: const Color(0xFF5D9EEA),
+                            ),  
+                            child: const Text('Save'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await AuthService().logout();
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LandingScreen()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.maxFinite, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              foregroundColor: Colors.white,
+                              backgroundColor: const Color(0xFF5D9EEA),
+                            ),  
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    ),
+                ),
+                )
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
