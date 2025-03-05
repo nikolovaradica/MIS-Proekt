@@ -58,12 +58,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (_emailController.text != user.email) {
           if (_passwordController.text.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
+              SnackBar(
+                content: const Text(
                   'Please enter your password to confirm changes', 
                   style: TextStyle(color: Color(0xFF5D9EEA)),
                 ),
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).primaryColor,
               ),
             );
             return;
@@ -77,25 +77,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         user.dateOfBirth = DateTime.parse(_dateOfBirthController.text);
 
         await userProvider.updateUser(user);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Profile updated successfully', 
-              style: TextStyle(color: Color(0xFF5D9EEA)),
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Profile updated successfully', 
+                style: TextStyle(color: Color(0xFF5D9EEA)),
+              ),
+              backgroundColor: Theme.of(context).primaryColor,
             ),
-            backgroundColor: Colors.white,
-          ),
-        );
+          );
+        }
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Error updating email: ${e.message}', 
-              style: const TextStyle(color: Color(0xFF5D9EEA)),
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error updating email: ${e.message}', 
+                style: const TextStyle(color: Color(0xFF5D9EEA)),
+              ),
+              backgroundColor: Theme.of(context).primaryColor,
             ),
-            backgroundColor: Colors.white,
-          ),
-        );
+          );
+        }
       }
     }
   }
@@ -132,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Container(
+                child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.9,
                   child: CentralCard(
                       child: Column(
@@ -182,10 +186,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 builder: (BuildContext context, Widget? child) {
                                   return Theme(
                                     data: ThemeData.light().copyWith(
-                                      colorScheme: const ColorScheme.light(
-                                        primary: Color(0xFF5D9EEA),
-                                        onPrimary: Colors.white
-                                      )
+                                      colorScheme: Theme.of(context).brightness == Brightness.dark
+                                        ? ColorScheme.dark(
+                                            primary: const Color(0xFF5D9EEA),
+                                            surface: Colors.grey[850]!,
+                                          )
+                                        : const ColorScheme.light(
+                                            primary: Color(0xFF5D9EEA)
+                                          ),
                                     ),
                                     child: child!
                                   );
@@ -214,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ElevatedButton(
                             onPressed: () async {
                               await AuthService().logout();
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LandingScreen()));
+                              if(context.mounted) Navigator.push(context, MaterialPageRoute(builder: (context) => const LandingScreen()));
                             },
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size(double.maxFinite, 50),

@@ -7,6 +7,7 @@ import 'package:lifelog/screens/profile_screen.dart';
 import 'package:lifelog/screens/view_daily_entry_screen.dart';
 import 'package:lifelog/screens/view_graphs_screen.dart';
 import 'package:lifelog/widgets/central_card.dart';
+import 'package:lifelog/widgets/dark_theme_toggle_button.dart';
 import 'package:lifelog/widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-// TODO fix login, register, profile page because when keyboard pops up it all goes to shit
+
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDay = DateTime.now();
 
@@ -25,8 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.loadUser();
     final userId = userProvider.user?.uid;
-    Provider.of<QuoteProvider>(context, listen: false).loadQuotes();
-    await Provider.of<DailyEntryProvider>(context, listen: false).fetchEntries(userId!);
+    if (mounted) {
+      Provider.of<QuoteProvider>(context, listen: false).loadQuotes();
+      await Provider.of<DailyEntryProvider>(context, listen: false).fetchEntries(userId!);
+    }
   }
 
   @override
@@ -52,6 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Stack(
             children: [
               const GradientBackground(showLogo: true),
+              const Positioned(
+                top: 40,
+                right: 20,
+                child: DarkThemeToggle(),
+              ),
               SafeArea(
                 child: Column(
                   children: [

@@ -10,7 +10,7 @@ class MapPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColor == Colors.white ? Colors.white : Colors.grey[850],
       title: const Center(child: Text('Location Map', style: TextStyle(fontSize: 20),)),
       content: SizedBox(
         width: double.maxFinite,
@@ -43,7 +43,7 @@ class MapPopup extends StatelessWidget {
           children: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(), 
-              child: const Text('Close', style: TextStyle(color: Colors.black),)
+              child: Text('Close', style: TextStyle(color: Theme.of(context).primaryColor == Colors.white ? Colors.black : Colors.white),)
             ),
           ],
         ),

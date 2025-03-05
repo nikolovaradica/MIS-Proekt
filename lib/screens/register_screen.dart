@@ -32,12 +32,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if(email.isEmpty || password.isEmpty || firstName.isEmpty || lastName.isEmpty || dob.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
+        SnackBar(
+            content: const Text(
               'Please populate all fields', 
               style: TextStyle(color: Color(0xFF5D9EEA)),
             ),
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).primaryColor,
           ),
         );
       return;
@@ -46,30 +46,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     DateTime? dateOfBirth = DateTime.tryParse(dob);
     if (dateOfBirth == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
+        SnackBar(
+          content: const Text(
             'Invalid Date of Birth', 
             style: TextStyle(color: Color(0xFF5D9EEA)),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).primaryColor,
         ),
       );
       return;
     }
 
     User? user = await _authService.register(email, password, firstName, lastName, dateOfBirth);
-    if (user != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(
-          content: Text(
-            'Register failed', 
-            style: TextStyle(color: Color(0xFF5D9EEA)),
+    if (mounted) {
+      if (user != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Register failed', 
+              style: TextStyle(color: Color(0xFF5D9EEA)),
+            ),
+            backgroundColor: Theme.of(context).primaryColor,
           ),
-          backgroundColor: Colors.white,
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -155,11 +157,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             lastDate: DateTime.now(),
                                             builder: (BuildContext context, Widget? child) {
                                               return Theme(
-                                                data: ThemeData.light().copyWith(
-                                                  colorScheme: const ColorScheme.light(
-                                                    primary: Color(0xFF5D9EEA),
-                                                    onPrimary: Colors.white
-                                                  )
+                                                data: ThemeData.from(
+                                                  colorScheme: Theme.of(context).brightness == Brightness.dark
+                                                      ? ColorScheme.dark(
+                                                        primary: const Color(0xFF5D9EEA),
+                                                        surface: Colors.grey[850]!,
+                                                      )
+                                                      : const ColorScheme.light(
+                                                        primary: Color(0xFF5D9EEA)
+                                                      ),
                                                 ),
                                                 child: child!
                                               );
@@ -208,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   RichText(
                                     text: TextSpan(
                                       text: 'Already have an account? ',
-                                      style: const TextStyle(fontWeight: FontWeight.w300, color: Colors.black),
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300, fontSize: 13),
                                       children: [
                                         TextSpan(
                                           text: 'Login',

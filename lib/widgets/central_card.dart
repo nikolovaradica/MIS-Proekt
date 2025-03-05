@@ -16,7 +16,7 @@ class CentralCard extends StatelessWidget {
       elevation: 5,
       margin: margin,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Colors.white,
+      color: Theme.of(context).primaryColor,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: child,

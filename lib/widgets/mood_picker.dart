@@ -17,7 +17,9 @@ class MoodPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text('Mood', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+        readOnly 
+          ? const Padding(padding: EdgeInsets.all(1)) 
+          : const Text('Mood', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
         const Padding(padding: EdgeInsets.only(top: 10)),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

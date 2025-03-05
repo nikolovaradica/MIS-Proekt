@@ -8,22 +8,26 @@ class GradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
+        Container(
+          color: isDarkMode ? Colors.grey[700] : Colors.white,
+        ),
         Positioned(
           top: -150,
           left: MediaQuery.of(context).size.width / 2 - 270,
           child: Container(
             width: 550,
             height: 550,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(
-                colors: [
-                  Color(0xFF94BCEB),
-                  Colors.white,
-                ],
-                radius: 0.55,
+                colors: isDarkMode
+                  ? [const Color(0xFF94BCEB), Colors.grey[700]!]
+                  : [const Color(0xFF94BCEB), Colors.white],
+                radius: 0.52,
               ),
             ),
           ),
@@ -34,14 +38,13 @@ class GradientBackground extends StatelessWidget {
           child: Container(
             width: 550,
             height: 550,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(
-                colors: [
-                  Color(0xFFA49EF4),
-                  Colors.white,
-                ],
-                radius: 0.55,
+                colors: isDarkMode
+                  ? [const Color(0xFFA49EF4), Colors.grey[700]!]
+                  : [const Color(0xFFA49EF4),Colors.white],
+                radius: 0.52,
               ),
             ),
           ),

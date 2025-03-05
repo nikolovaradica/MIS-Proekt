@@ -67,8 +67,9 @@ class _AddDailyEntryScreenState extends State<AddDailyEntryScreen> {
       photoOfTheDayPath: photoOfTheDay!.path,
     );
     final dateOnly = DateTime(widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day);
+    
     await Provider.of<DailyEntryProvider>(context, listen: false).addEntry(entry, dateOnly);
-    Navigator.pop(context);
+    if(context.mounted) Navigator.pop(context);
   }
 
   @override
@@ -155,7 +156,7 @@ class _AddDailyEntryScreenState extends State<AddDailyEntryScreen> {
                                       'Location set to: (${position.latitude}, ${position.longitude})', 
                                       style: const TextStyle(color: Color(0xFF5D9EEA)),
                                     ),
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: context.mounted ? Theme.of(context).primaryColor : Colors.white,
                                   )
                                 );
                               } catch (e) {
@@ -165,7 +166,7 @@ class _AddDailyEntryScreenState extends State<AddDailyEntryScreen> {
                                       'Failed to get location: $e', 
                                       style: const TextStyle(color: Color(0xFF5D9EEA)),
                                     ),
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: context.mounted ? Theme.of(context).primaryColor : Colors.white,
                                   ),
                                 );
                               }
@@ -176,8 +177,8 @@ class _AddDailyEntryScreenState extends State<AddDailyEntryScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 side: const BorderSide(color: Color.fromARGB(255, 207, 207, 207))  
                               ),
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
                             ),
                             icon: const Icon(Icons.location_on, color: Color(0xFF5D9EEA)),
                             label: currentLocation == null

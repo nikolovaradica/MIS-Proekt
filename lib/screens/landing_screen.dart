@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifelog/screens/login_screen.dart';
 import 'package:lifelog/screens/register_screen.dart';
+import 'package:lifelog/widgets/dark_theme_toggle_button.dart';
 import 'package:lifelog/widgets/gradient_background.dart';
 
 class LandingScreen extends StatelessWidget {
@@ -12,6 +13,11 @@ class LandingScreen extends StatelessWidget {
       body: Stack(
         children: [
           const GradientBackground(),
+          const Positioned(
+            top: 40,
+            right: 20,
+            child: DarkThemeToggle(),
+          ),
           Center(
             child: Card(
               elevation: 5,

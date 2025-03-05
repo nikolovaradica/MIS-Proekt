@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lifelog/models/daily_entry.dart';
@@ -95,7 +93,7 @@ class ViewDailyEntryScreen extends StatelessWidget {
                                 padding: const EdgeInsets.all(10),
                                 child: Text(
                                   entry.gratefulFor,
-                                  style: const TextStyle(fontSize: 16),
+                                  style: const TextStyle(fontSize: 16, color: Colors.black),
                                 ),
                               ),
                             ),
@@ -109,7 +107,7 @@ class ViewDailyEntryScreen extends StatelessWidget {
                                 padding: const EdgeInsets.all(10),
                                 child: Text(
                                   entry.highlights,
-                                  style: const TextStyle(fontSize: 16),
+                                  style: const TextStyle(fontSize: 16, color: Colors.black),
                                 ),
                               ),
                             ),
@@ -128,7 +126,7 @@ class ViewDailyEntryScreen extends StatelessWidget {
                                         entry.location != null && (entry.location!.latitude != 0.0 || entry.location!.longitude != 0.0)
                                           ? 'Lat: ${entry.location?.latitude}, \nLng: ${entry.location?.longitude}'
                                           : 'Location not provided',
-                                        style: const TextStyle(fontSize: 16),
+                                        style: const TextStyle(fontSize: 16, color: Colors.black),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -159,7 +157,7 @@ class ViewDailyEntryScreen extends StatelessWidget {
                                       return Center(
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Container(
+                                          child: SizedBox(
                                             height: 50,
                                             width: 50,
                                             child: CircularProgressIndicator(

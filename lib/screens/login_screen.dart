@@ -26,30 +26,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
+        SnackBar(
+          content: const Text(
             'Please populate all fields', 
             style: TextStyle(color: Color(0xFF5D9EEA)),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).primaryColor,
         ),
       );
       return;
     }
 
     User? user = await _authService.login(email, password);
-    if (user != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Login failed', 
-            style: TextStyle(color: Color(0xFF5D9EEA)),
+    if(mounted) {
+      if (user != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Login failed', 
+              style: TextStyle(color: Color(0xFF5D9EEA)),
+            ),
+            backgroundColor: Theme.of(context).primaryColor,
           ),
-          backgroundColor: Colors.white,
-        ),
-      );
+        );
+      } 
     }
   }
 
@@ -140,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     RichText(
                                       text: TextSpan(
                                         text: "Don't have an account? ",
-                                        style: const TextStyle(fontWeight: FontWeight.w300, color: Colors.black),
+                                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300, fontSize: 13), 
                                         children: [
                                           TextSpan(
                                             text: 'Register',

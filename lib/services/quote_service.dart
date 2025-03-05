@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 class QuoteService {
   static const String apiUrl = "https://zenquotes.io/api/quotes/";
+  final Logger _logger = Logger();
 
   Future<List<Map<String, String>>> fetchQuotes() async {
     try {
@@ -16,14 +18,12 @@ class QuoteService {
           };
         }).toList();
       } else {
-        print("Failed to load quotes");
+        _logger.e("Failed to load quotes");
         return [];
-        // throw Exception("Failed to load quotes");
       }
     } catch (e) {
-      print("Error fetching quotes: $e");
+      _logger.e("Error fetching quotes", error: e);
       return [];
-      // throw Exception("Error fetching quotes: $e");
     }
   }
 }

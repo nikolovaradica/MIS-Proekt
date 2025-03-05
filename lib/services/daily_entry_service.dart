@@ -1,27 +1,25 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:lifelog/models/daily_entry.dart';
+import 'package:logger/logger.dart';
 
 class DailyEntryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final Logger _logger = Logger();
 
   Future<void> addDailyEntry(DailyEntry entry, DateTime date) async {
     try {
       String docId = "${entry.userId}_${date.toIso8601String()}";
 
-      if (entry.photoOfTheDayPath != null) {
-        File imageFile = File(entry.photoOfTheDayPath!);
-        String photoUrl = await uploadImage(imageFile);
-        entry.photoOfTheDayPath = photoUrl;
-      }
-      // print("PAAAAAAAAAAAAAATH");
-      // print(entry.photoOfTheDayPath);
+      File imageFile = File(entry.photoOfTheDayPath);
+      String photoUrl = await uploadImage(imageFile);
+      entry.photoOfTheDayPath = photoUrl;
+      
       await _firestore.collection('daily_entries').doc(docId).set(entry.toMap());
     } catch (e) {
-      print("Error adding daily entry: $e");
+      _logger.e("Error adding daily entry", error: e);
     }
   }
 
@@ -51,7 +49,7 @@ class DailyEntryService {
 
       return downloadUrl;
     } catch (e) {
-      print("Error uploading image: $e");
+      _logger.e("Error uploading image", error: e);
       throw Exception('Image upload failed');
     }
   }

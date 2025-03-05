@@ -29,13 +29,13 @@ class PhotoOfTheDay extends StatelessWidget {
               width: double.maxFinite,
               height: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Theme.of(context).primaryColor == Colors.white ? Colors.grey[300] : Colors.grey[500],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.camera_alt,
                 size: 50,
-                color: Colors.grey,
+                color: Theme.of(context).primaryColor == Colors.white ? Colors.grey[500] : Colors.grey[700],
               ),
             ),
           )
